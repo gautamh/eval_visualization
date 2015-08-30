@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 	<head>
 	  <meta charset="utf-8">
@@ -43,7 +43,7 @@
 
         <p class="trigger top">Input instructor name:</p>
 
-        <input class="filter top" oninput="updateData()"/>
+        <input class="filter top" oninput="updateSVGs()"/>
 
         <div id="loading">
             <p>Loading...</p>
@@ -51,6 +51,24 @@
 
         <div class="graphic">
 		<script type="text/javascript">
+            //Vars
+            var w1 = 300;
+            var h1 = 500;
+            var padding = 20;
+            var labelArea = 200;
+            var barPadding = 1;
+            var numBars = 24;
+
+            var transitionTime = 300;
+
+            var yScale;
+            var xScale;
+            var colorScale;
+
+            var yAxis;
+
+            var svgs = [];
+
             var fullDataset = [];
             var dataset = [];                         //Initialize empty array
             /*for (var i = 0; i < 25; i++) {            //Loop 25 times
@@ -79,47 +97,68 @@
                     }
                 })
 
+                class_ratings_data = data.map(function (d) {
+                    instructor = d.instructor;
+                    rating = d.class_rating_avg;
+                    count = d.class_rating_count;
+
+                    return {
+                        "instructor": instructor,
+                        "rating": +rating,
+                        "count": +count
+                    }
+                })
+
+                instructor_ratings_data = data.map(function (d) {
+                    instructor = d.instructor;
+                    rating = d.instructor_rating_avg;
+                    count = d.instructor_rating_count;
+
+                    return {
+                        "instructor": instructor,
+                        "rating": +rating,
+                        "count": +count
+                    }
+                })
+
                 //console.log(fullDataset);
-                generateVis();
+                svgs.push({
+                    svg: generateVis(0, w1, h1, instructor_ratings_data, 255, 0, 0),
+                    data: instructor_ratings_data,
+                    r: 255,
+                    g: 0,
+                    b: 0
+                });
+                svgs.push({
+                    svg: generateVis(0, w1, h1, class_ratings_data, 0, 0, 255),
+                    data: class_ratings_data,
+                    r: 0,
+                    g: 0,
+                    b: 255
+                });
             });
 
-            //Vars
-            var w = 300;
-            var h = 500;
-            var padding = 20;
-            var labelArea = 200;
-            var barPadding = 1;
-            var numBars = 24;
+            function generateVis(horizontal_offset, w, h, ratings_data, r, g, b) {
 
-            var transitionTime = 300;
+                horizontal_offset = typeof horizontal_offset !== 'undefined' ? horizontal_offset : 0;
 
-            var yScale;
-            var xScale;
-            var colorScale;
-
-            var yAxis;
-
-            var svg;
-
-            function generateVis() {
-
-                dataset = fullDataset.slice(0, 24);
+                dataset = ratings_data.slice(0, 24);
                 console.log(dataset);
 
-                
+
 
                 //Scales
                 yScale = d3.scale.linear()
                     //.domain([0, d3.max(dataset, function (d) { return d.class_rating; })])
                     .domain([0, 5])
-                    .range([0, w]);
+                    .range([/*horizontal_offset*/0, w/* + horizontal_offset*/]);
 
                 xScale = d3.scale.ordinal()
                     .domain(d3.range(numBars))
                     .rangeRoundBands([padding, h - padding], 0.1)
 
                 colorScale = d3.scale.linear()
-                    .domain([0, d3.max(dataset, function (d) { return d.class_rating; })])
+                    .domain([0, d3.max(dataset, function (d) { return d.rating; })])
                     .range([0, 255]);
 
                 //Axis
@@ -145,8 +184,9 @@
 
                 //Render
                 svg = d3.select("body").append("svg");
-                svg.attr("width", w + padding + labelArea).attr("height", h + padding)
-                    .attr("class", "graphic");
+                svg.attr("width", w + padding + labelArea/* + horizontal_offset*/).attr("height", h + padding)
+                    .attr("class", "graphic")
+                    .attr("style", "float:left");
 
                 //Bars
                 var rects = svg.selectAll("rect")
@@ -160,15 +200,15 @@
                         },
                         x: function (d) {
                             //return yScale(d.class_rating);
-                            0
+                            return 0/*horizontal_offset*/
                         },
                         //width: w / dataset.length - barPadding,
                         height: xScale.rangeBand(),
                         width: function (d) {
-                            return yScale(d.class_rating);
+                            return yScale(d.rating)/* - horizontal_offset*/;
                         },
                         fill: function (d) {
-                            return "rgb(" + Math.round(colorScale(d.class_rating)) + ", 0, 0)";
+                            return "rgb(" + (r * Math.round(colorScale(d.rating))) + ", " + (g * Math.round(colorScale(d.rating))) + ", " + (b * Math.round(colorScale(d.rating))) + ")";
                         }
                     });
 
@@ -178,7 +218,7 @@
                     .enter()
                     .append("text")
                     .text(function (d) {
-                        return d.class_rating.toFixed(1);
+                        return d.rating.toFixed(1);
                     })
                     .attr({
                         y: function (d, i) {
@@ -186,13 +226,13 @@
                             //return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
                         },
                         x: function (d) {
-                            return Math.min(yScale(d.class_rating) - 15, w - 10);
+                            return Math.min(yScale(d.rating) - 15, w - 10/* + horizontal_offset*/);
 
                         },
                         "font-family": "sans-serif",
                         "font-size": "11px",
                         fill: function (d) {
-                            if (yScale(d.class_rating) > 15) {
+                            if (yScale(d.rating) > 15) {
                                 return "white";
                             }
                             else {
@@ -202,6 +242,7 @@
                         "text-anchor": "middle",
                         "class": "label"
                     });
+
 
                 //Names
                 var names = svg.selectAll(".name")
@@ -217,7 +258,7 @@
                             //return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
                         },
                         x: function (d) {
-                            return w + padding;
+                            return w + padding/* + horizontal_offset*/;
                         },
                         "font-family": "sans-serif",
                         "font-size": "11px",
@@ -249,14 +290,19 @@
                 //var filter = d3.select(".filter")
                     //.on("input", function () {
 
-              
+                return svg;
             }
 
-            function updateData() {
+            function updateSVGs() {
+                svgs.forEach(function (viz) { updateData(viz.svg, viz.data, viz.r, viz.g, viz.b); });
+
+            }
+
+            function updateData(svg, ratings_data, r, g, b) {
 
                 var filterInput = document.getElementsByClassName("filter")[0].value;
 
-                dataset = fullDataset.filter(function (d)
+                dataset = ratings_data.filter(function (d)
                 {
                     return d.instructor.toLowerCase().includes(filterInput.toLowerCase());
                 })
@@ -288,17 +334,17 @@
                         //width: w / dataset.length - barPadding,
                         height: xScale.rangeBand(),
                         width: function (d) {
-                            return yScale(d.class_rating);
+                            return yScale(d.rating);
                         },
                         fill: function (d) {
-                            return "rgb(" + Math.round(colorScale(d.class_rating)) + ", 0, 0)";
+                            return "rgb(" + (r * Math.round(colorScale(d.rating))) + ", " + (g * Math.round(colorScale(d.rating))) + ", " + (b * Math.round(colorScale(d.rating))) + ")";
                         }
                     });
 
                 labels.enter()
                     .append("text")
                     .text(function (d) {
-                        return d.class_rating.toFixed(1);
+                        return d.rating.toFixed(1);
                     })
                     .attr({
                         y: function (d, i) {
@@ -306,13 +352,13 @@
                             //return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
                         },
                         x: function (d) {
-                            return Math.min(yScale(d.class_rating) - 15, w - 10);
+                            return Math.min(yScale(d.rating) - 15, w1 - 10);
 
                         },
                         "font-family": "sans-serif",
                         "font-size": "11px",
                         fill: function (d) {
-                            if (yScale(d.class_rating) > 15) {
+                            if (yScale(d.rating) > 15) {
                                 return "white";
                             }
                             else {
@@ -334,7 +380,7 @@
                             //return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
                         },
                         x: function (d) {
-                            return w + padding;
+                            return w1 + padding;
                         },
                         "font-family": "sans-serif",
                         "font-size": "11px",
@@ -358,17 +404,17 @@
                         //width: w / dataset.length - barPadding,
                         height: xScale.rangeBand(),
                         width: function (d) {
-                            return yScale(d.class_rating);
+                            return yScale(d.rating);
                         },
                         fill: function (d) {
-                            return "rgb(" + Math.round(colorScale(d.class_rating)) + ", 0, 0)";
+                            return "rgb(" + (r * Math.round(colorScale(d.rating))) + ", " + (g * Math.round(colorScale(d.rating))) + ", " + (b * Math.round(colorScale(d.rating))) + ")";
                         }
                     });
 
                 labels.transition()
                     .duration(transitionTime)
                     .text(function (d) {
-                        return d.class_rating.toFixed(1);
+                        return d.rating.toFixed(1);
                     })
                     .attr({
                         y: function (d, i) {
@@ -376,13 +422,13 @@
                             //return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
                         },
                         x: function (d) {
-                            return Math.min(yScale(d.class_rating) - 15, w - 10);
+                            return Math.min(yScale(d.rating) - 15, w1 - 10);
 
                         },
                         "font-family": "sans-serif",
                         "font-size": "11px",
                         fill: function (d) {
-                            if (yScale(d.class_rating) > 15) {
+                            if (yScale(d.rating) > 15) {
                                 return "white";
                             }
                             else {
@@ -404,7 +450,7 @@
                             //return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
                         },
                         x: function (d) {
-                            return w + padding;
+                            return w1 + padding;
                         },
                         "font-family": "sans-serif",
                         "font-size": "11px",
