@@ -3,10 +3,23 @@
 	<head>
 	  <meta charset="utf-8">
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<title>D3 Page Template</title>
+		<title>Course Ratings Interactive</title>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
         <style type="text/css">
+            body, html {
+                margin: 0;
+                padding: 0;
+                background-color: rgb(246, 245, 242);
+            }
+
+            #wrap {
+                margin: 21px auto 21px auto;
+                padding: 0px 5px;
+                width: 1050px;
+                background-color: white;
+            }
+
             .axis path,
             .axis line {
                 fill: none;
@@ -26,12 +39,35 @@
 
            p { font-family: sans-serif; }
 
-           top {
+           .top {
                vertical-align: top;
            }
 
-           graphic {
+            .title {
+                font-family: ambroise-std, 'Times New Roman', serif;
+                font-size: 40px;
+                color: white;
+                margin-left: 5px;
+                text-decoration: none;
+            }
+
+           #title-bar {
+               background-color: rgb(2, 27, 63);
+               margin-top: 0px;
+           }
+
+           .bottom {
                vertical-align: bottom;
+           }
+
+           .graphic {
+               vertical-align: bottom;
+           }
+
+           .svg {
+               margin-right: 3px;
+               width: 522px;
+               float: left;
            }
 
         </style>
@@ -40,16 +76,27 @@
         <!-- <p class="trigger add">Click on this text to add a value.</p>
 
         <p class="trigger remove">Click on this text to remove a value.</p> -->
+        <div id="wrap">
+            <div id="title-bar">
+                <p class="top title"><a class="title" href="http://www.dukechronicle.com">The Chronicle</a></p>
+            </div>
+            <p class="top">Welcome to The Chronicle's course ratings interactive! This page uses data from Duke's internal course evaluations filled out by students.</p>
+            <p class="top">Type in the name of any Duke professor or instructor. If they've made their course evaluation ratings public to students on ACES, you can see their average class rating and instructor rating across all the classes they've taught.</p>
+            <p class="trigger top">Instructor name:</p>
 
-        <p class="trigger top">Input instructor name:</p>
+            <input class="filter top" oninput="updateSVGs()" placeholder="Enter a Professor's name..."/>
 
-        <input class="filter top" oninput="updateSVGs()"/>
+            <div id="loading">
+                <p>Loading...</p>
+            </div>
+        
+            <div class="svg" id="svg1"><p>Average Instructor Rating:</p></div>
+            <div class="svg" id="svg2"><p>Average Class Rating:</p></div>
 
-        <div id="loading">
-            <p>Loading...</p>
+            <p class="bottom">Created by Gautam Hathi for The Duke Chronicle using <a href="http://d3js.org/">d3.js</a> with help from <a href="http://chimera.labs.oreilly.com/books/1230000000345/index.html"> O'Reilly's D3 book</a>. Code on <a href="https://github.com/gautamh/eval_visualization">Github</a>.</p>
+            <p class="bottom">Interested in working on the future of digital journalism (including fun stuff like this) for The Chronicle? <a href="mailto:gautam.hathi@duke.edu?Subject=Chronline" target="_top"> Email Gautam.</a></p>
         </div>
 
-        <div class="graphic">
 		<script type="text/javascript">
             //Vars
             var w1 = 300;
@@ -123,14 +170,14 @@
 
                 //console.log(fullDataset);
                 svgs.push({
-                    svg: generateVis(0, w1, h1, instructor_ratings_data, 255, 0, 0),
+                    svg: generateVis(0, w1, h1, instructor_ratings_data, 255, 0, 0, "#svg1"),
                     data: instructor_ratings_data,
                     r: 255,
                     g: 0,
                     b: 0
                 });
                 svgs.push({
-                    svg: generateVis(0, w1, h1, class_ratings_data, 0, 0, 255),
+                    svg: generateVis(0, w1, h1, class_ratings_data, 0, 0, 255, "#svg2"),
                     data: class_ratings_data,
                     r: 0,
                     g: 0,
@@ -138,7 +185,7 @@
                 });
             });
 
-            function generateVis(horizontal_offset, w, h, ratings_data, r, g, b) {
+            function generateVis(horizontal_offset, w, h, ratings_data, r, g, b, div) {
 
                 horizontal_offset = typeof horizontal_offset !== 'undefined' ? horizontal_offset : 0;
 
@@ -183,10 +230,18 @@
 
 
                 //Render
-                svg = d3.select("body").append("svg");
+                svg = d3.select(div).append("svg");
                 svg.attr("width", w + padding + labelArea/* + horizontal_offset*/).attr("height", h + padding)
                     .attr("class", "graphic")
                     .attr("style", "float:left");
+                
+                //svg.append("text")
+                //    .attr("x", (w / 2))
+                //    .attr("y", 0 - (padding / 2))
+                //    .attr("text-anchor", "middle")
+                //    .style("font-size", "16px")
+                //    .style("text-decoration", "underline")
+                //    .text("Value vs Date Graph");
 
                 //Bars
                 var rects = svg.selectAll("rect")
@@ -208,7 +263,7 @@
                             return yScale(d.rating)/* - horizontal_offset*/;
                         },
                         fill: function (d) {
-                            return "rgb(" + (r * Math.round(colorScale(d.rating))) + ", " + (g * Math.round(colorScale(d.rating))) + ", " + (b * Math.round(colorScale(d.rating))) + ")";
+                            return "rgb(" + (r * (Math.round(colorScale(d.rating)) / 255) ) + ", " + (g * (Math.round(colorScale(d.rating)) / 255) ) + ", " + (b * (Math.round(colorScale(d.rating)) / 255)) + ")";
                         }
                     });
 
@@ -250,7 +305,7 @@
                     .enter()
                     .append("text")
                     .text(function (d) {
-                        return d.instructor + " (" + d.count + ")";
+                        return d.instructor + " (" + d.count + " classes)";
                     })
                     .attr({
                         y: function (d, i) {
@@ -337,7 +392,7 @@
                             return yScale(d.rating);
                         },
                         fill: function (d) {
-                            return "rgb(" + (r * Math.round(colorScale(d.rating))) + ", " + (g * Math.round(colorScale(d.rating))) + ", " + (b * Math.round(colorScale(d.rating))) + ")";
+                            return "rgb(" + (r * (Math.round(colorScale(d.rating)) / 255)) + ", " + (g * (Math.round(colorScale(d.rating)) / 255)) + ", " + (b * (Math.round(colorScale(d.rating)) / 255)) + ")";
                         }
                     });
 
@@ -407,7 +462,7 @@
                             return yScale(d.rating);
                         },
                         fill: function (d) {
-                            return "rgb(" + (r * Math.round(colorScale(d.rating))) + ", " + (g * Math.round(colorScale(d.rating))) + ", " + (b * Math.round(colorScale(d.rating))) + ")";
+                            return "rgb(" + (r * (Math.round(colorScale(d.rating)) / 255)) + ", " + (g * (Math.round(colorScale(d.rating)) / 255)) + ", " + (b * (Math.round(colorScale(d.rating)) / 255)) + ")";
                         }
                     });
 
@@ -442,7 +497,7 @@
                 names.transition()
                     .duration(transitionTime)
                     .text(function (d) {
-                        return d.instructor + " (" + d.count + ")";
+                        return d.instructor + " (" + d.count + " classes)";
                     })
                     .attr({
                         y: function (d, i) {
@@ -476,6 +531,18 @@
                     .remove();
             }
 		</script>
-        </div>
+
+        <script>
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-5900287-29', 'auto');
+            ga('send', 'pageview');
+
+        </script>
 	</body>
 </html>
