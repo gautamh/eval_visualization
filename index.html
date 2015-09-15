@@ -363,7 +363,7 @@
 
                 dataset = ratings_data.filter(function (d)
                 {
-                    return d.instructor.toLowerCase().includes(filterInput.toLowerCase());
+                    return ( d.instructor.toLowerCase().indexOf(filterInput.toLowerCase()) > -1 );
                 })
                     .slice(0, 24);
                 console.log(dataset);
