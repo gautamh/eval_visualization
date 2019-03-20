@@ -42,14 +42,19 @@
            .top {
                vertical-align: top;
            }
+		   
+		   .note {
+		       font-weight: bold;
+			   font-style: italic;
+		   }
 
-            .title {
-                font-family: ambroise-std, 'Times New Roman', serif;
-                font-size: 40px;
-                color: white;
-                margin-left: 5px;
-                text-decoration: none;
-            }
+           .title {
+               font-family: ambroise-std, 'Times New Roman', serif;
+               font-size: 40px;
+               color: white;
+               margin-left: 5px;
+               text-decoration: none;
+           }
 
            #title-bar {
                background-color: rgb(2, 27, 63);
@@ -84,6 +89,7 @@
             <div id="title-bar">
                 <p class="top title"><a class="title" href="http://www.dukechronicle.com">The Chronicle</a></p>
             </div>
+			<p class="top note">Note: This interactive was originally published along with the story linked below. Access to data on Duke professors was restricted to within Duke, so this external version uses fake data for professors. The department data is the same as in the original.</p>
             <p class="top">Welcome to The Chronicle's course ratings interactive! This page uses data from Duke's internal course evaluations filled out by students. You can check out our analysis of course ratings data <a href="http://www.dukechronicle.com/article/2015/04/closer-look-course-evaluations">here</a>.</p>
             <p class="top">Type in the name of any Duke professor or instructor. If they've made their course evaluation ratings public to students on ACES, you can see their average class rating and instructor rating across all the classes they've taught. If the professor you're looking for doesn't show up, they may not have made their evaluations public, or they may be listed under a slightly different name (e.g. Alexander vs Alex). Try searching for the professor's last name.</p>
             <p class="trigger top">Instructor name:</p>
@@ -102,7 +108,7 @@
             <script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'></script><div class='tableauPlaceholder' style='width: 1004px; height: 869px;'><noscript><a href='#'><img alt='Department Dashboard ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;De&#47;DepartmentRatingsv2&#47;DepartmentDashboard&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz' width='1004' height='869' style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='site_root' value='' /><param name='name' value='DepartmentRatingsv2&#47;DepartmentDashboard' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;De&#47;DepartmentRatingsv2&#47;DepartmentDashboard&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='showVizHome' value='no' /><param name='showTabs' value='y' /><param name='bootstrapWhenNotified' value='true' /></object></div>
 
             <p class="bottom">Created by Gautam Hathi for The Duke Chronicle using <a href="http://d3js.org/">d3.js</a>. Code on <a href="https://github.com/gautamh/eval_visualization">Github</a>.</p>
-            <p class="bottom">Interested in working on the future of digital journalism (including fun stuff like this) for The Chronicle? <a href="mailto:gautam.hathi@duke.edu?Subject=Chronline" target="_top"> Email us.</a></p>
+            <p class="bottom">Interested in working on the future of digital journalism (including fun stuff like this)? <a href="mailto:gautamhathi@gmail.com?Subject=Chronline" target="_top"> Email us.</a></p>
         </div>
 
 		<script type="text/javascript">

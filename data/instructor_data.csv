@@ -1,9 +1,5 @@
 ﻿instructor,class_rating_avg,class_rating_count,instructor_rating_avg,instructor_rating_count
 Albus Dumbledore,5,50,5,55
-Godric Gryffindor,5,100,5,100
-Rowena Ravenclaw,5,100,4.8,100
-Helga Hufflepuff,5,100,4.8,100
-Salazar Slytherin,5,100,3,100
 Alecto Carrow,1,2,1,2
 Amycus Carrow,1,2,1,2
 Aurora Sinistra,3.9,10,3.9,9
@@ -30,3 +26,7 @@ Severus Snape,3.9,17,2.5,19
 Silvanus Kettleburn,4,11,4.7,11
 Sybill Trelawney,3.5,19,1.5,19
 Wilhelmina Grubbly-Plank,3.7,1,4.5,1
+Godric Gryffindor,5,100,5,100
+Rowena Ravenclaw,5,100,4.8,100
+Helga Hufflepuff,5,100,4.8,100
+Salazar Slytherin,5,100,3,100
